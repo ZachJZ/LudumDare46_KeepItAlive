@@ -13,43 +13,65 @@ public class PlayerController : MonoBehaviour
     Vector2 movement;
     Vector2 aim;
     Vector2 Mouse;
+
+    public GameObject myAim;
     //float vert;
     //float hori;
+
+        //HEALTH
+    private int pHealth;
+    private bool iFrames;
+    private float iTimer;
+    [SerializeField]
+    private float iLimit;
+    private float flashTimer;
+    [SerializeField]
+    private float flashLimit;
+    public HealthCounter_Lab1 healthCounter;
+    private List<HealthCounter_Lab1> HCInst;
+    //private float difference;
+    //public GameObject Begin;
+    //public GameObject Target;
+
+
+
+
+
 
     // Start is called before the first frame update
     void Start()
     {
         //Cursor.lockState = CursorLockMode.Locked;
         //Cursor.lockState = CursorLockMode.None;
+            //HEALTH
+        pHealth = 5;
+        //difference = Begin.GetComponent<RectTransform>().position.x - Target.GetComponent<RectTransform>().position.x;
     }
 
     // Update is called once per frame
     void Update()
     {
         PlayerActions();
-        //PlayerAiming();
 
-        //input
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
         aim.x = Input.GetAxis("Mouse X");
-        //aim.y = Input.GetAxis("Mouse Y");
         aim.y = Input.GetAxis("Mouse Y");
 
         MouseMath();
 
-
         myAnim.SetFloat("Speed", movement.sqrMagnitude);
 
-
+            //HEALTH
+        Invincibility();
+        AimTracking();
     }
 
     void FixedUpdate()
     {
         //Movement
         rb.MovePosition(rb.position + movement * pSpeed * Time.fixedDeltaTime);
-
     }
 
     void PlayerActions()
@@ -65,7 +87,16 @@ public class PlayerController : MonoBehaviour
             //spear
          
     }
+    void AimTracking()
+    {
+        //    //Ray ray = UnityEngine.Camera.main.ScreenPointToRay(Input.mousePosition);
+        //    //Plane playerPlane = new Plane(Vector3.forward, transform.position);
 
+        //https://www.youtube.com/watch?v=Geb_PnF1wOk
+        Vector3 dir = Input.mousePosition - Camera.main.WorldToScreenPoint(transform.position);
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        myAim.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+    }
     void MouseMath()
     {
 
@@ -77,117 +108,127 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    //void PlayerAiming()
-    //{
+        //HEALTH
+    public void DamagePlayer()
+    {
+        if (!iFrames)
+        {
+            pHealth--;
 
-    //    //Ray ray = UnityEngine.Camera.main.ScreenPointToRay(Input.mousePosition);
-    //    //Plane playerPlane = new Plane(Vector3.forward, transform.position);
+            iFrames = true;
+            //play hurt sound
+            //myDJ.playPlayerHurt();
+            updateHealth(pHealth);
 
-    //    //https://www.youtube.com/watch?v=Geb_PnF1wOk
-    //    Vector3 dir = Input.mousePosition - Camera.main.WorldToScreenPoint(transform.position);
-    //    float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-    //    //transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+            if (pHealth <= 1)
+            {
+                //lose game
+                print("You lost!");
+                LoseGame();
+                //deactivate player
+                //deactivate hud
+                //lose screen
+                //main menu OR restart
+            }
+        }
+    }
+    public void HealPlayer()
+    {
+        if (pHealth < 5)
+        {
+            pHealth++;
+            updateHealth(pHealth);
+            //myDJ.playPickUp();
+        }
+    }
+    public void Invincibility()
+    {
+        if (iFrames)
+        {
+            iTimer += Time.deltaTime;
+            flashTimer += Time.deltaTime;
 
-    //    print(dir);
+            if (flashTimer >= flashLimit)
+            {
+                if (GetComponent<SpriteRenderer>().enabled)
+                {
+                    GetComponent<SpriteRenderer>().enabled = false;
+                    flashTimer = 0;
+                }
+                else if (!GetComponent<SpriteRenderer>().enabled)
+                {
+                    GetComponent<SpriteRenderer>().enabled = true;
+                    flashTimer = 0;
+                }
+            }
 
-    //    if (dir.x > 0 && dir.y > 0) //rights //top right //positives
-    //    {
-    //        if (Mathf.Abs(dir.x) > Mathf.Abs(dir.y))
-    //        {
-    //            //right
-    //            hori = 1;
-    //            myAnim.SetFloat("Horizontal", hori);
-    //        }
-    //        else
-    //        {
-    //            //up
-    //            vert = 1;
-    //            myAnim.SetFloat("Vertical", vert);
-    //        }
-    //    }
-    //    else if (dir.x < 0 && dir.y > 0) //outs //top left
-    //    {
-    //        //print("top left");
-    //        if (Mathf.Abs(dir.x) > Mathf.Abs(dir.y))
-    //        {
-    //            //left
-    //            hori = -1;
-    //                //Mathf.Clamp((Mathf.Abs(dir.x)), -1, 1);
-    //            //print("went left");
-    //            myAnim.SetFloat("Horizontal", hori);
-    //        }
-    //        else
-    //        {
-    //            //up
-    //            vert = 1;
-    //            //print("went top ");
-    //            myAnim.SetFloat("Vertical", vert);
-    //        }
-    //    }
-    //    else if (dir.x < 0 && dir.y < 0) //lefts //bottom left //negatives
-    //    {
-    //        if (Mathf.Abs(dir.x) > Mathf.Abs(dir.y))
-    //        {
-    //            //left
-    //            hori = -1;
-    //            myAnim.SetFloat("Horizontal", hori);
-    //        }
-    //        else
-    //        {
-    //            //down
-    //            vert = -1;
-    //            myAnim.SetFloat("Vertical", vert);
-    //        }
-    //    }
-    //    else if (dir.x > 0 && dir.y < 0) //ins //bottom right
-    //    {
-    //        print("down right");
-    //        if (Mathf.Abs(dir.x) > Mathf.Abs(dir.y))
-    //        {
-    //            //right
-    //            hori = 1;
-    //            print("went right");
-    //            myAnim.SetFloat("Horizontal", hori);
-    //        }
-    //        else
-    //        {
-    //            //down
-    //            vert = -1;
-    //            print("went down");
-    //            myAnim.SetFloat("Vertical", vert);
-    //        }
-    //    }
+            if (iTimer >= iLimit)
+            {
+                print("iTimer running");
+                GetComponent<SpriteRenderer>().enabled = true;
+                iFrames = false;
+                iTimer = 0;
+            }
+        }
+    }
+    public void CreateHealthIcons(int numHealth)
+    {
+        print("Creating " + numHealth + " health");
+        //Check to see if the list is empty
+        if (HCInst == null)
+        {
+            //Creates a new list
+            HCInst = new List<HealthCounter_Lab1>();
+            HCInst.Add(healthCounter);
+            //Sets the space between each new icon
+//Vector3 positionOffSet = new Vector3(-difference, 0f, 0f);
+            //print("PosOff " + positionOffSet);
 
 
-    //    //https://forum.unity.com/threads/rotate-to-direction-based-on-mouse-position.606943/
-    //    //if (Mathf.Abs(vec.y) > Mathf.Abs(vec.x))
-    //    //{
-    //    //    // Vertical
-    //    //    if (vec.y > 0) direction = Dir.Up;
-    //    //    if (vec.y < 0) direction = Dir.Down;
-    //    //}
-    //    //else
-    //    //{
-    //    //    // Horizontal
-    //    //    if (vec.x > 0) direction = Dir.Right;
-    //    //    if (vec.x < 0) direction = Dir.Left;
-    //    //}
+            //
+            for (int i = 1; i < numHealth; ++i)
+            {
 
-    //    ////player points to where the mouse is
-    //    //Plane playerPlane = new Plane(Vector3.up, transform.position);
-    //    //Ray ray = UnityEngine.Camera.main.ScreenPointToRay(Input.mousePosition);
+                //Sets the script to a usable variable
+                HealthCounter_Lab1 newHealth;
+                //Creates new healthCounter and sets position and rotation
+                newHealth = Instantiate(healthCounter, healthCounter.transform.position, healthCounter.transform.rotation, FindObjectOfType<Canvas>().transform) as HealthCounter_Lab1;
+                newHealth.GetComponent<RectTransform>().localScale = new Vector3(2, 2, 1);
 
-    //    //float hitDist = 0.0f;
+                //Sets value of newPosition to where the first icon was created
+                Vector3 newPosition = newHealth.transform.position;
+                //Sets position based off of number of icons created
+//newPosition.x += (positionOffSet.x * i);
+                //Places icon at appropriate position
+                newHealth.transform.position = newPosition;
+                //Makes sure each new icon is in a uniform scale
+                newHealth.transform.localScale = new Vector3(1f, 1f, 1f);
 
-    //    //if (playerPlane.Raycast(ray, out hitDist))
-    //    //{
-    //    //    Vector3 targetpoint = ray.GetPoint(hitDist);
-    //    //    Quaternion targetRotation = Quaternion.LookRotation(targetpoint - transform.position);
-    //    //    targetRotation.x = 0;
-    //    //    targetRotation.z = 0;
-    //    //    transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 7f * Time.deltaTime);
-    //    //}
-    //}
+                //Adds counter to list
+                HCInst.Add(newHealth);
+            }
+        }
+    }
+    public void updateHealth(int numHealth)
+    {
+        print(numHealth + " is numHealth");
+        //Runs through a number of times equal to the size of the list
+        for (int i = 0; i < HCInst.Count; i++)
+        {
+            //print("did the update hearts thing");
+            //Sets active each icon that is to be used
+            bool bActivate = i < numHealth;
+            HCInst[i].gameObject.SetActive(bActivate);
+            print(i + " is heart, and " + bActivate + " is its state");
+        }
+    }
+    public void LoseGame()
+    {
+        Cursor.visible = true;
+        //freezeMenu(true);
+        //LoseScreen.SetActive(true);
+        //myDJ.playSadChord();
+    }
 
 
 }
