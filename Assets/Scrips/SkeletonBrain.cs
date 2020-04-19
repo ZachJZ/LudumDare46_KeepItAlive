@@ -31,15 +31,12 @@ public class SkeletonBrain : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //speed = 230;
         nextWaypointDistance = 3;
 
         seeker = GetComponent<Seeker>();
         rb = GetComponent<Rigidbody2D>();
 
-
-
-        headHunt = Random.Range(1, 3);
+        headHunt = Random.Range(1, 4);
 
         if (headHunt == 1)
         {
@@ -49,10 +46,6 @@ public class SkeletonBrain : MonoBehaviour
         {
             target = spawn.transform;
         }
-
-        //look at player and spawn
-        //target closest
-
         weakness = "Thunder";
         speed = Random.Range(200, 230);
         health = 2;
@@ -75,10 +68,7 @@ public class SkeletonBrain : MonoBehaviour
             path = p;
             currentWaypoint = 0;
         }
-
-
     }
-
     // Update is called once per frame
     void FixedUpdate()
     {
