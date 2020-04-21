@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour
 {
+    private PlayerController myPlayer;
+    public GameObject loseScreen;
+    public GameObject winScreen;
 
     //HEALTH
     private int pHealth;
@@ -27,6 +30,7 @@ public class PlayerHealth : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        myPlayer = FindObjectOfType<PlayerController>().gameObject.GetComponent<PlayerController>();
         //HEALTH
         pHealth = 5;
         maxHealth = 4;
@@ -88,7 +92,7 @@ public class PlayerHealth : MonoBehaviour
     }
 
 
-    void OnTriggerEnter2D(Collider2D col)
+    void OnCollisionEnter2D(Collision2D col)
     {
         if (col.gameObject.GetComponent<SkeletonBrain>())
         {
@@ -205,10 +209,39 @@ public class PlayerHealth : MonoBehaviour
 
 
     }
+
+    public void WinGame()
+    {
+        Cursor.visible = true;
+        myPlayer.SetPlaying(false);
+        StartCoroutine(ScaleTime(1.0f, 0.0f, 3.0f));
+        myPlayer.pauseMenu.SetActive(true);
+        winScreen.SetActive(true);
+
+    }
     public void LoseGame()
     {
         Cursor.visible = true;
-        //SOUND: Loss
+        myPlayer.SetPlaying(false);
+        StartCoroutine(ScaleTime(1.0f, 0.0f, 3.0f));
+        myPlayer.pauseMenu.SetActive(true);
+        loseScreen.SetActive(true);
     }
+
+    IEnumerator ScaleTime(float start, float end, float time)
+    {
+        float lastTime = Time.realtimeSinceStartup;
+        float timer = 0.0f;
+
+        while (timer < time)
+        {
+            Time.timeScale = Mathf.Lerp(start, end, timer / time);
+            timer += (Time.realtimeSinceStartup - lastTime);
+            lastTime = Time.realtimeSinceStartup;
+            yield return null;
+        }
+        Time.timeScale = end;
+    }
+
 
 }

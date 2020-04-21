@@ -31,6 +31,9 @@ public class SkeletonBrain : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        player = FindObjectOfType<PlayerController>().gameObject;
+        spawn = FindObjectOfType<Summon>().gameObject;
+
         nextWaypointDistance = 3;
 
         seeker = GetComponent<Seeker>();

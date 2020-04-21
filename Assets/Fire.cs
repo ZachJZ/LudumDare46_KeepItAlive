@@ -20,12 +20,18 @@ public class Fire : MonoBehaviour
         
     }
 
-    void OnCollisionEnter2d(Collider2D col)
+    void OnCollisionEnter2D(Collision2D col)
     {
         if (col.gameObject.name == "Tilemap_Walls&Bounds")
         {
             print("Hit bounds");
             Destroy(gameObject);
+        }
+
+        if (col.gameObject.GetComponent<SkeletonBrain>())
+        {
+            Destroy(col.gameObject);
+            rb.velocity = transform.right * speed * 2;
         }
     }
 }

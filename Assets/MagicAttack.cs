@@ -65,10 +65,6 @@ public class MagicAttack : MonoBehaviour
         {
             mySprite.sprite = Scope5;
         }
-
-
-
-
     }
     public void AddSpell(int Add)
     {
@@ -76,5 +72,10 @@ public class MagicAttack : MonoBehaviour
         {
             spells = Mathf.Clamp(spells + Add, 0, 4);
         }
+    }
+
+    public int getSpells()
+    {
+        return spells;
     }
 }

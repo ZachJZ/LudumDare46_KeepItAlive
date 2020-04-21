@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    bool gaming;
+    bool pausedGame;
+    public GameObject pauseMenu;
 
     public float pSpeed = 5f;
 
@@ -21,6 +24,8 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        gaming = true;
+        pausedGame = true;
         //Cursor.lockState = CursorLockMode.Locked;
         //Cursor.lockState = CursorLockMode.None;
     }
@@ -29,18 +34,6 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         PlayerActions();
-
-        movement.x = Input.GetAxisRaw("Horizontal");
-        movement.y = Input.GetAxisRaw("Vertical");
-
-        aim.x = Input.GetAxis("Mouse X");
-        aim.y = Input.GetAxis("Mouse Y");
-
-        MouseMath();
-
-        myAnim.SetFloat("Speed", movement.sqrMagnitude);
-
-        AimTracking();
     }
 
     void FixedUpdate()
@@ -51,16 +44,43 @@ public class PlayerController : MonoBehaviour
 
     void PlayerActions()
     {
-        //has magic
-            //fire
-            //lightning
-            //ice
+        if (gaming)
+        {
+            movement.x = Input.GetAxisRaw("Horizontal");
+            movement.y = Input.GetAxisRaw("Vertical");
 
-        //has weapon
-            //axe
-            //sword
-            //spear
-         
+            aim.x = Input.GetAxis("Mouse X");
+            aim.y = Input.GetAxis("Mouse Y");
+
+            MouseMath();
+
+            myAnim.SetFloat("Speed", movement.sqrMagnitude);
+
+            AimTracking();
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                pausedGame = !pausedGame;
+                PauseGame();
+            }
+        }
+    }
+    public void PauseGame()
+    {
+        if (pausedGame)
+        {
+            //unpause
+            Time.timeScale = 1f;
+            pauseMenu.SetActive(false);
+            pausedGame = true;
+        }
+        else
+        {
+            //pause 
+            Time.timeScale = 0.0f;
+            pauseMenu.SetActive(true);
+            pausedGame = false;
+        }
     }
     void AimTracking()
     {
@@ -74,13 +94,16 @@ public class PlayerController : MonoBehaviour
     }
     void MouseMath()
     {
-
         Mouse.x = Mathf.Clamp(Mouse.x += aim.x, -1, 1);
         Mouse.y = Mathf.Clamp(Mouse.y += aim.y, -1, 1);
 
         myAnim.SetFloat("Vertical", Mouse.y);
         myAnim.SetFloat("Horizontal", Mouse.x);
+    }
 
+    public void SetPlaying(bool gameOver)
+    {
+        gaming = gameOver;
     }
 
 

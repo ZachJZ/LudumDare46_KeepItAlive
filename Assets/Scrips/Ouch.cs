@@ -27,10 +27,9 @@ public class Ouch : MonoBehaviour
     {
         if (col.GetComponent<Fire>())
         {
-            SkeleHealth--;
-            Destroy(col.gameObject);
             Death();
         }
+
         //addforce being flung backwards
         //decrement health
     }
